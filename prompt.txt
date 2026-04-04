@@ -1,0 +1,11 @@
+createa a login page with singup for student teacher and admin dashbaord.
+each with different /page 
+and also with design and teacher with only able to type student roll number 
+and upload their respective marks... of subject because each teacher can on;
+have certain subjects access with certain grps acces... 
+also with students can haveoptions like exam forum... refal forms..
+ticket option... admit card optuon... settinga. info chnage. etc,
+and they can see their marks in tiket a student can create ticket 
+and it will connect to the respective subject teacher but it will be 
+anonymous for student.; and for admin. it will make sure teacher can't 
+change marks after it have been finally uploaded. same with students... etc
