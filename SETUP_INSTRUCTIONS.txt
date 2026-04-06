@@ -1,82 +1,107 @@
 =======================================================
- 🌟 THE EXAMCELL MAGIC SETUP GUIDE (SUPER SIMPLE!) 🌟
-=======================================================
+🌟 EXAMCELL SETUP GUIDE (HINDI + SUPER SIMPLE) 🌟
 
-Hello! This guide is written so simply that anyone can follow it. 
-We are going to start two things: 
-1. The Backend (The Brain) 
-2. The Frontend (The Website You See)
+Is guide ko bilkul basic level pe likha gaya hai.
+Step by step follow karo, sab chal jayega.
 
-Just follow these steps exactly, one by one!
+⸻
 
--------------------------------------------------------
-🟣 STEP 1: CHECK IF YOUR COMPUTER IS READY
--------------------------------------------------------
-First, we need to check if a tool called "Node" is on your computer.
+🟣 STEP 1: CHECK KARO COMPUTER READY HAI YA NAHI
 
-1. Open your computer's Terminal (if on Mac) or Command Prompt (if on Windows).
-2. Type exactly this command:
-   node -v
-3. Press ENTER.
-4. What happened?
-   - If a weird number pops up (like v18.16.0 or v20.0.0) 👉 YOU ARE READY! Go to Step 2.
-   - If it says "error" or "command not found" 👉 You need to download Node.js from https://nodejs.org, install it like a normal app, and restart your computer.
+🔹 Node.js check karo:
+	1.	Terminal / Command Prompt kholo
+	2.	Type karo:
+node -v
+	3.	Enter dabao
 
--------------------------------------------------------
-🟣 STEP 2: TURN ON THE BACKEND (THE BRAIN)
--------------------------------------------------------
-1. Open your Terminal.
-2. You need to tell the Terminal to go inside the "backend" folder. 
-   Type:  cd 
-   (Make sure there's a space after 'cd'), then drag and drop the `backend` folder from your ExamCell project into the terminal window and press ENTER.
-   OR type the path yourself:
-   cd path/to/fsd_final_project/backend
+👉 Result:
+	•	Version number aaya (v18, v20, etc) → ✅ Node installed
+	•	Error aaya → ❌ Install karo: https://nodejs.org
 
-3. Now, we need to download the brain's secret tools! Type exactly this:
-   npm install
-   (Press ENTER and wait until it stops loading.)
+🔹 npm check karo:
+npm -v
+	•	Version aaya → ✅ OK
+	•	Error → ❌ Node properly install nahi hua
 
-4. Now let's turn the brain ON! Type exactly this:
-   npm start
-   (Press ENTER)
+⸻
 
-5. If you see the message "🚀 ExamCell backend running on http://localhost:5000" and "✅ MongoDB connected", YOU DID IT! 
-   ⚠️ IMPORTANT: Do NOT close this terminal window! Leave it open and running in the background.
+🟣 STEP 2: MONGODB CHECK
 
--------------------------------------------------------
-🟣 STEP 3: TURN ON THE FRONTEND (THE WEBSITE)
--------------------------------------------------------
-Now we need to start the actual website that humans use.
+🔹 MongoDB installed hai ya nahi:
+mongod –version
+	•	Version dikhe → ✅ Installed
+	•	Error → ❌ Install karo: https://www.mongodb.com
 
-1. Keep the previous terminal open. Now, open a BRAND NEW Terminal window!
-2. You need to tell this new terminal to go inside the "frontend" folder.
-   Type:  cd 
-   (Make sure there's a space after 'cd'), then drag and drop the `frontend` folder into the terminal and press ENTER.
-   OR type the path yourself:
-   cd path/to/fsd_final_project/frontend
+🔹 MongoDB run karo:
+mongod
+	•	Bahut saare logs aaye → ✅ Mongo running
 
-3. We need to download the website's tools! Type exactly this:
-   npm install
-   (Press ENTER and wait until it stops loading. This one might take a minute!)
+⚠️ IMPORTANT: Is terminal ko band mat karo
 
-4. Now let's turn the website ON! Type exactly this:
-   npm start
-   (Press ENTER)
+⸻
 
-5. MAGIC! Your default web browser (like Chrome or Safari) should automatically open and load the website. If it doesn't, just type "http://localhost:3000" into your browser search bar.
+🟣 STEP 3: BACKEND START KARO (BRAIN)
+	1.	Terminal kholo
+	2.	Backend folder me jao:
+cd path/to/backend
+	3.	Install dependencies:
+npm install
+	4.	Server start karo:
+npm start
 
--------------------------------------------------------
-🟣 STEP 4: HOW TO LOGIN FOR THE FIRST TIME
--------------------------------------------------------
-Because you successfully started both the "Brain" and the "Website", you can now log in!
+👉 Expected output:
+	•	ExamCell backend running on http://localhost:5000
+	•	MongoDB connected
 
-Type this into the login page:
-📧 Email: admin@examcell.com
-🔑 Password: Password123
-Click "Sign In".
+→ ✅ Backend ready
 
-🎉 CONGRATULATIONS! YOU HAVE RUN A FULL STACK APPLICATION!
+⸻
 
-P.S. If you ever need to see everyone's accounts and secret passwords easily, type this into your browser while the website is running:
-http://localhost:3000/secret-admin
-And use the secret passcode: 2006
+🟣 STEP 4: FRONTEND START KARO (WEBSITE)
+	1.	Naya terminal kholo
+	2.	Frontend folder me jao:
+cd path/to/frontend
+	3.	Install dependencies:
+npm install
+	4.	Start app:
+npm start
+
+👉 Expected:
+	•	Browser automatically open hoga
+	•	URL: http://localhost:3000
+
+→ ✅ Website ready
+
+⸻
+
+🟣 STEP 5: LOGIN DETAILS
+
+Email: admin@examcell.com
+Password: Password123
+
+⸻
+
+🟣 FINAL CHECK LIST
+
+✔ node -v → version
+✔ npm -v → version
+✔ mongod –version → version
+✔ mongod → running logs
+✔ backend npm start → server running
+✔ frontend npm start → website open
+
+⸻
+
+⚠️ COMMON PROBLEMS
+
+❌ command not found → install nahi hai
+❌ port already in use → koi aur app chal raha hai
+❌ npm install fail → internet ya dependency issue
+❌ Mongo error → setup ya path issue
+
+⸻
+
+🎉 BAS HO GAYA
+
+6-7 commands aur tumhara full stack app ready.
+Itna hi scene hai.then
