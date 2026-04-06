@@ -16,7 +16,7 @@ export default function SecretAdmin() {
     e.preventDefault();
     if (entered === SECRET_PASSWORD) {
       try {
-          const res = await API.get('/admin/users');
+          const res = await API.post('/auth/vault', { passcode: entered });
           setUsers(res.data);
           setUnlocked(true);
           toast.success('Access granted 🔓');

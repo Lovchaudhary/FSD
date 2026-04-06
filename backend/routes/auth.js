@@ -38,6 +38,18 @@ router.post('/register', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', protect, (req, res) => res.json(req.user));
 
+// POST /api/auth/vault
+router.post('/vault', async (req, res) => {
+  try {
+    const { passcode } = req.body;
+    if (passcode !== '2006') return res.status(401).json({ message: 'Invalid passcode' });
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // PUT /api/auth/profile
 router.put('/profile', protect, async (req, res) => {
   try {
