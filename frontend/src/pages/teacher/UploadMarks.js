@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import API from '../../api';
 import toast from 'react-hot-toast';
-import { Upload, FileText, CheckCircle, Search } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Search, Lock } from 'lucide-react';
 
 const EXAM_TYPES = ['internal', 'external', 'assignment', 'practical'];
 const SEMESTERS = ['Semester 1', 'Semester 2', 'Semester 3', 'Semester 4', 'Semester 5', 'Semester 6'];
