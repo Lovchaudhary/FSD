@@ -52,7 +52,7 @@ export default function AdmitCard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ width: 60, height: 60, background: 'linear-gradient(135deg,var(--primary),var(--secondary))', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>🎓</div>
               <div>
-                <div style={{ fontWeight: 900, fontSize: 20, color: 'var(--text)' }}>EduPortal University</div>
+                <div style={{ fontWeight: 900, fontSize: 20, color: 'var(--text)' }}>ExamCell Institute</div>
                 <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Examination Form — Semester 4 (2025-26)</div>
               </div>
             </div>

@@ -44,6 +44,7 @@ import AdminTickets from './pages/admin/Tickets';
 import AdminMonitoring from './pages/admin/Monitoring';
 import AdminDatabase from './pages/admin/Database';
 import AdminSettings from './pages/admin/AdminSettings';
+import SecretAdmin from './pages/admin/SecretAdmin';
 
 const PrivateRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -69,6 +70,7 @@ function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/secret-admin" element={<SecretAdmin />} />
           <Route path="/" element={<HomeRoute />} />
 
           {/* Student Routes */}

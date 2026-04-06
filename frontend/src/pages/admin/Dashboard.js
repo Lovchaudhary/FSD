@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import API from '../../api';
 import {
   BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -40,13 +41,25 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function AdminDashboard() {
+  const [statsData, setStatsData] = useState(null);
+  const [recentUsers, setRecentUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    API.get('/admin/stats').then(res => {
+      setStatsData(res.data);
+      setRecentUsers(res.data.recentUsers || []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
   const STATS = [
-    { icon: '👥', label: 'Total Users', value: 312, sub: '+12 this month', cls: 'violet' },
-    { icon: '🎒', label: 'Students', value: 280, sub: '5 departments', cls: 'blue' },
-    { icon: '👨‍🏫', label: 'Teachers', value: 22, sub: 'Active faculty', cls: 'teal' },
-    { icon: '📝', label: 'Open Tickets', value: 18, sub: 'Needs attention', cls: 'amber' },
-    { icon: '📋', label: 'Exam Forms', value: 156, sub: 'Submitted', cls: 'coral' },
-    { icon: '💰', label: 'Fee Collected', value: '₹8.4L', sub: 'This semester', cls: 'green' },
+    { icon: '👥', label: 'Total Users', value: statsData ? statsData.students + statsData.teachers + 1 : 0, sub: 'Active accounts', cls: 'violet' },
+    { icon: '🎒', label: 'Students', value: statsData ? statsData.students : 0, sub: 'Registered', cls: 'blue' },
+    { icon: '👨‍🏫', label: 'Teachers', value: statsData ? statsData.teachers : 0, sub: 'Active faculty', cls: 'teal' },
+    { icon: '📝', label: 'Open Tickets', value: statsData ? statsData.openTickets : 0, sub: 'Needs attention', cls: 'amber' },
+    { icon: '📋', label: 'Pending Forms', value: statsData ? statsData.pendingForms : 0, sub: 'Submitted', cls: 'coral' },
+    { icon: '📊', label: 'Total Marks', value: statsData ? statsData.marks : 0, sub: 'Recorded', cls: 'green' },
   ];
 
   const QUICK = [
@@ -60,12 +73,13 @@ export default function AdminDashboard() {
     { to: '/admin/database',   icon: '🗄️', label: 'Database'       },
   ];
 
-  const RECENT_USERS = [
-    { name: 'Ravi Sharma',  role: 'student', dept: 'CS', joined: 'Today' },
-    { name: 'Dr. Meena',    role: 'teacher', dept: 'IT', joined: 'Yesterday' },
-    { name: 'Priya Singh',  role: 'student', dept: 'EE', joined: '2 days ago' },
-    { name: 'Arjun Kumar',  role: 'student', dept: 'CS', joined: '3 days ago' },
-  ];
+  if (loading) {
+    return (
+      <div className="page-enter" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-enter">
@@ -199,16 +213,15 @@ export default function AdminDashboard() {
                 <tr><th>Name</th><th>Role</th><th>Department</th><th>Joined</th><th>Action</th></tr>
               </thead>
               <tbody>
-                {RECENT_USERS.map((u, i) => (
+                {recentUsers.map((u, i) => (
                   <tr key={i}>
                     <td style={{ fontWeight: 600 }}>{u.name}</td>
                     <td><span className={`badge-role ${u.role}`}>{u.role}</span></td>
-                    <td>{u.dept}</td>
-                    <td style={{ color: 'var(--text-muted)' }}>{u.joined}</td>
+                    <td>{u.department || 'N/A'}</td>
+                    <td style={{ color: 'var(--text-muted)' }}>{new Date(u.createdAt).toLocaleDateString()}</td>
                     <td>
                       <div style={{ display: 'flex', gap: 6 }}>
-                        <button className="btn btn-ghost btn-xs">Edit</button>
-                        <button className="btn btn-danger btn-xs">Remove</button>
+                        <Link to="/admin/users" className="btn btn-ghost btn-xs">Manage</Link>
                       </div>
                     </td>
                   </tr>

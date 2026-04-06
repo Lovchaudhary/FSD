@@ -22,10 +22,13 @@ export default function StudentForms() {
   const [form, setForm] = useState({ formType: '', semester: '', subjects: [] });
 
   const fetchForms = () => {
-    API.get('/student/forms').then(r => setForms(r.data)).finally(() => setLoading(false));
+    API.get('/student/forms')
+       .then(r => setForms(r.data))
+       .catch(() => toast.error('Failed to load forms'))
+       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchForms(); }, []);
+  useEffect(() => { fetchForms(); }, [user]);
 
   const openForm = (type) => {
     setActiveType(type);
@@ -43,13 +46,15 @@ export default function StudentForms() {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await API.post('/student/forms', form);
+      await API.post('/student/forms', {
+        semester: parseInt(form.semester?.replace(/\D/g, '')) || 1,
+        examType: form.formType === 'exam' ? 'regular' : form.formType,
+        subjects: form.subjects,
+      });
       toast.success('Application submitted successfully!');
       setShowModal(false);
       fetchForms();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to submit application');
-    }
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to submit form'); }
   };
 
   return (
@@ -123,7 +128,7 @@ export default function StudentForms() {
                           {f.status === 'approved' ? <><CheckCircle size={10} /> Approved</> : f.status === 'rejected' ? <><XCircle size={10} /> Rejected</> : <><Clock size={10} /> Pending</>}
                         </span>
                       </td>
-                      <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(f.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(f.submittedAt || f.createdAt).toLocaleDateString(undefined, { day: '2-digit', month: 'short' })}</td>
                       <td><span className="chip" style={{ fontFamily: 'monospace', fontSize: 11 }}>{f._id.slice(-6).toUpperCase()}</span></td>
                     </tr>
                   ))}

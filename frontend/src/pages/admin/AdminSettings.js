@@ -13,7 +13,7 @@ export default function AdminSettings() {
     maxFileUploadMB: 10,
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
-    smtpUser: 'admin@eduportal.com',
+    smtpUser: 'admin@examcell.com',
   });
 
   const handle = (key, value) => setSettings(prev => ({ ...prev, [key]: value }));

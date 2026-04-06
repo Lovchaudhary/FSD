@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import API from '../../api';
 import toast from 'react-hot-toast';
 import { CheckCircle, XCircle, Search, Clock, FileText, Filter, MoreVertical, Database } from 'lucide-react';
@@ -16,26 +16,32 @@ export default function AdminForms() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const fetchForms = () => {
-    API.get('/admin/forms').then(r => setForms(r.data)).finally(() => setLoading(false));
+    API.get('/admin/forms').then(res => {
+      setForms(res.data);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   };
 
   useEffect(() => { fetchForms(); }, []);
 
   const updateStatus = async (id, status) => {
-    const remarks = status === 'rejected' ? window.prompt('Reason for rejection (optional):') : '';
     try {
-      await API.put(`/admin/forms/${id}`, { status, remarks: remarks || '' });
-      toast.success(`Application decision published: ${status.toUpperCase()}`);
+      if (status === 'rejected') {
+        const reason = window.prompt('Reason for rejection (optional):', '');
+        await API.put(`/admin/forms/${id}/reject`, { remarks: reason });
+        toast.success('Application rejected.');
+      } else if (status === 'approved') {
+        await API.put(`/admin/forms/${id}/approve`);
+        toast.success('Application approved!');
+      }
       fetchForms();
-    } catch (err) {
-      toast.error('Failed to publish application decision');
-    }
+    } catch { toast.error('Action failed'); }
   };
 
   const filtered = forms.filter(f => {
     const matchStatus = statusFilter === 'all' || f.status === statusFilter;
     const q = search.toLowerCase();
-    const matchSearch = !q || f.studentId?.name?.toLowerCase().includes(q) || f.studentId?.rollNumber?.toLowerCase().includes(q) || f.formType?.toLowerCase().includes(q);
+    const matchSearch = !q || f.studentName?.toLowerCase().includes(q) || f.rollNumber?.toLowerCase().includes(q) || f.examType?.toLowerCase().includes(q);
     return matchStatus && matchSearch;
   });
 
@@ -110,17 +116,17 @@ export default function AdminForms() {
                     <tbody>
                        {filtered.map(f => (
                           <tr key={f._id}>
-                             <td><div style={{ fontWeight: 800, color: 'var(--text)' }}>{f.studentId?.name || '—'}</div></td>
-                             <td><span className="chip" style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--text-dim)', fontSize: 12 }}>{f.studentId?.rollNumber || 'NO ROLL'}</span></td>
-                             <td><span style={{ fontWeight: 700, color: 'var(--text-2)', fontSize: 13 }}>{FORM_LABELS[f.formType] || f.formType}</span></td>
-                             <td><span className="badge bg-warm-2" style={{ fontWeight: 900, fontSize: 10, letterSpacing: 0.5 }}>{f.semester.toUpperCase()}</span></td>
+                              <td><div style={{ fontWeight: 800, color: 'var(--text)' }}>{f.studentName || '—'}</div></td>
+                              <td><span className="chip" style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--text-dim)', fontSize: 12 }}>{f.rollNumber || 'NO ROLL'}</span></td>
+                              <td><span style={{ fontWeight: 700, color: 'var(--text-2)', fontSize: 13 }}>{f.examType || 'regular'}</span></td>
+                              <td><span className="badge bg-warm-2" style={{ fontWeight: 900, fontSize: 10, letterSpacing: 0.5 }}>SEM {f.semester}</span></td>
                              <td>
                                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 160 }}>
                                    {(f.subjects || []).slice(0,2).map(s => <span key={s} className="badge bg-warm-2" style={{ color: 'var(--text-dim)', fontSize: 9 }}>{s}</span>)}
                                    {(f.subjects || []).length > 2 && <span className="badge bg-warm-2" style={{ fontSize: 9 }}>+{f.subjects.length - 2}</span>}
                                 </div>
                              </td>
-                             <td style={{ fontSize: 11, color: 'var(--text-muted)' }}>{new Date(f.createdAt).toLocaleDateString()}</td>
+                              <td style={{ fontSize: 11, color: 'var(--text-muted)' }}>{new Date(f.submittedAt).toLocaleDateString()}</td>
                              <td>
                                 <span className={`badge ${f.status === 'approved' ? 'badge-approved' : f.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}`}>
                                     {f.status === 'approved' ? <><CheckCircle size={10} /> Published</> : f.status === 'rejected' ? <><XCircle size={10} /> Discarded</> : <><Clock size={10} /> Reviewing</>}

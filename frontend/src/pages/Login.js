@@ -3,79 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const ROLES = [
   { id: 'student', emoji: '🎒', label: 'Student' },
   { id: 'teacher', emoji: '👨‍🏫', label: 'Teacher' },
   { id: 'admin', emoji: '⚙️', label: 'Admin' },
 ];
-
-const LEFT_FEATURES = [
-  { icon: '📋', text: 'Exam Form Submission & Tracking' },
-  { icon: '📊', text: 'Live Marks & Performance Charts' },
-  { icon: '🎫', text: 'Anonymous Ticket System' },
-  { icon: '🎓', text: 'Admit Card & Result Download' },
-];
-
-const ANNOUNCEMENTS = [
-  { type: 'notice', icon: 'ℹ️', text: 'Semester exam forms open until Apr 15' },
-  { type: 'alert', icon: '⚠️', text: 'Fee submission deadline: Apr 30' },
-];
-
-// Simple calendar widget
-function MiniCalendar() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const [view, setView] = useState({ year, month });
-
-  const monthName = new Date(view.year, view.month).toLocaleString('default', { month: 'long', year: 'numeric' });
-  const firstDay = new Date(view.year, view.month, 1).getDay();
-  const daysInMonth = new Date(view.year, view.month + 1, 0).getDate();
-  const dayLabels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-  // Event days (mock)
-  const eventDays = [5, 12, 15, 22, 28];
-
-  const cells = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-  return (
-    <div className="auth-calendar">
-      <div className="auth-calendar-header">
-        <button onClick={() => setView(v => {
-          const m = v.month - 1;
-          return m < 0 ? { year: v.year - 1, month: 11 } : { ...v, month: m };
-        })} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 4px' }}>
-          <ChevronLeft size={14} />
-        </button>
-        <span>{monthName}</span>
-        <button onClick={() => setView(v => {
-          const m = v.month + 1;
-          return m > 11 ? { year: v.year + 1, month: 0 } : { ...v, month: m };
-        })} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 4px' }}>
-          <ChevronRight size={14} />
-        </button>
-      </div>
-      <div className="auth-calendar-grid">
-        {dayLabels.map(d => <div key={d} className="cal-day header">{d}</div>)}
-        {cells.map((day, i) => (
-          <div
-            key={i}
-            className={`cal-day ${day === today.getDate() && view.month === today.getMonth() && view.year === today.getFullYear()
-                ? 'today'
-                : eventDays.includes(day) ? 'has-event' : ''
-              }`}
-          >
-            {day || ''}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -92,7 +26,6 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Apply default theme on login page
   useEffect(() => {
     document.documentElement.classList.remove('theme-violet', 'theme-rose', 'theme-teal', 'theme-amber');
   }, []);
@@ -122,13 +55,13 @@ export default function Login() {
           subjects: form.subjects ? form.subjects.split(',').map(s => s.trim()) : [],
           groups: form.groups ? form.groups.split(',').map(g => g.trim()) : [],
         };
-        const { data } = await API.post('/auth/signup', payload);
+        const { data } = await API.post('/auth/register', payload);
         login(data.user, data.token);
-        toast.success('Account created successfully! 🎓');
+        toast.success(`Account created! Welcome, ${data.user.name}! 🎉`);
         navigate(`/${data.user.role}`);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Something went wrong');
+      toast.error(err.response?.data?.message || err.message || 'Something went wrong');
     }
     setLoading(false);
   };
@@ -136,189 +69,171 @@ export default function Login() {
   const pageTitle = isForgot ? 'Reset Password' : isLogin ? 'Welcome back!' : 'Create account';
   const pageSubtitle = isForgot
     ? "We'll send a reset link to your email"
-    : isLogin
-      ? 'Sign in to your portal account'
-      : 'Join EduPortal today';
+    : isLogin ? 'Sign in to your portal account' : 'Join ExamCell today';
 
   return (
-    <div className="auth-page">
-      {/* Left Panel */}
-      <div className="auth-page-left">
-        <div className="auth-left-content">
-          <div className="auth-left-logo">🎓</div>
-          <h1>EduPortal</h1>
-          <p>Your all-in-one academic management platform for students, teachers &amp; admins.</p>
-          <div className="auth-features">
-            {LEFT_FEATURES.map((f, i) => (
-              <div key={i} className="auth-feature-item">
-                <div className="auth-feature-icon">{f.icon}</div>
-                <span>{f.text}</span>
-              </div>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      fontFamily: 'var(--font-sans)',
+    }}>
+      {/* Ambient blobs */}
+      <div style={{ position: 'fixed', top: '-10%', right: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(224,124,84,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', bottom: '-15%', left: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(108,99,255,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+      <div style={{
+        background: 'rgba(255,255,255,0.97)',
+        borderRadius: 24,
+        boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
+        padding: '48px 44px',
+        width: '100%',
+        maxWidth: 460,
+        position: 'relative',
+        zIndex: 1,
+      }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto 16px', boxShadow: '0 8px 24px rgba(224,124,84,0.3)' }}>🎓</div>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: 'var(--text)', marginBottom: 4 }}>{pageTitle}</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>{pageSubtitle}</p>
+        </div>
+
+        {/* Role tabs — sign up only */}
+        {!isLogin && !isForgot && (
+          <div className="role-tabs" style={{ marginBottom: 24 }}>
+            {ROLES.map(r => (
+              <button
+                key={r.id}
+                className={`role-tab ${role === r.id ? 'active' : ''}`}
+                onClick={() => setRole(r.id)}
+                type="button"
+              >
+                <span className="role-emoji">{r.emoji}</span>
+                {r.label}
+              </button>
             ))}
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Right Panel */}
-      <div className="auth-page-right">
-        <div className="auth-card">
-          <div className="auth-logo">
-            <h2>{pageTitle}</h2>
-            <p>{pageSubtitle}</p>
-          </div>
-
-          {/* Role tabs — only for sign up */}
-          {!isLogin && !isForgot && (
-            <div className="role-tabs">
-              {ROLES.map(r => (
-                <button
-                  key={r.id}
-                  className={`role-tab ${role === r.id ? 'active' : ''}`}
-                  onClick={() => setRole(r.id)}
-                  type="button"
-                >
-                  <span className="role-emoji">{r.emoji}</span>
-                  {r.label}
-                </button>
-              ))}
+        {/* Forgot Password Form */}
+        {isForgot ? (
+          <form onSubmit={submit}>
+            <div className="form-group">
+              <label>Email Address</label>
+              <input
+                className="form-control"
+                type="email"
+                placeholder="Enter your registered email"
+                value={resetEmail}
+                onChange={e => setResetEmail(e.target.value)}
+                required
+              />
             </div>
-          )}
-
-          {/* Forgot Password Form */}
-          {isForgot ? (
-            <form onSubmit={submit}>
+            <button className="btn btn-primary btn-full" style={{ marginTop: 8 }} disabled={loading}>
+              {loading ? 'Sending...' : 'Send Reset Link'}
+            </button>
+            <div className="auth-switch">
+              <button type="button" onClick={() => setIsForgot(false)}>← Back to Sign In</button>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={submit}>
+            {!isLogin && (
               <div className="form-group">
-                <label>Email Address</label>
+                <label>Full Name</label>
+                <input className="form-control" name="name" placeholder="Your full name" value={form.name} onChange={handle} required />
+              </div>
+            )}
+
+            <div className="form-group">
+              <label>Email Address</label>
+              <input className="form-control" name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handle} required />
+            </div>
+
+            <div className="form-group">
+              <label>Password</label>
+              <div style={{ position: 'relative' }}>
                 <input
                   className="form-control"
-                  type="email"
-                  placeholder="Enter your registered email"
-                  value={resetEmail}
-                  onChange={e => setResetEmail(e.target.value)}
+                  name="password"
+                  type={showPass ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handle}
                   required
+                  style={{ paddingRight: 44 }}
                 />
-              </div>
-              <button className="btn btn-primary btn-full" style={{ marginTop: 8 }} disabled={loading}>
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </button>
-              <div className="auth-switch">
-                <button type="button" onClick={() => setIsForgot(false)}>← Back to Sign In</button>
-              </div>
-            </form>
-          ) : (
-            <form onSubmit={submit}>
-              {!isLogin && (
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input className="form-control" name="name" placeholder="" value={form.name} onChange={handle} required />
-                </div>
-              )}
-
-              <div className="form-group">
-                <label>Email Address</label>
-                <input className="form-control" name="email" type="email" placeholder="" value={form.email} onChange={handle} required />
-              </div>
-
-              <div className="form-group">
-                <label>Password</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    className="form-control"
-                    name="password"
-                    type={showPass ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={form.password}
-                    onChange={handle}
-                    required
-                    style={{ paddingRight: 44 }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                    style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
-                  >
-                    {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                {isLogin && (
-                  <div style={{ textAlign: 'right', marginTop: 6 }}>
-                    <button
-                      type="button"
-                      onClick={() => setIsForgot(true)}
-                      style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {!isLogin && role === 'student' && (
-                <>
-                  <div className="form-group">
-                    <label>Roll Number</label>
-                    <input className="form-control" name="rollNumber" placeholder="" value={form.rollNumber} onChange={handle} />
-                  </div>
-                  <div className="form-group">
-                    <label>Department</label>
-                    <input className="form-control" name="department" placeholder="" value={form.department} onChange={handle} />
-                  </div>
-                  <div className="form-group">
-                    <label>Section / Group</label>
-                    <input className="form-control" name="groups" placeholder="" value={form.groups} onChange={handle} />
-                  </div>
-                </>
-              )}
-
-              {!isLogin && role === 'teacher' && (
-                <>
-                  <div className="form-group">
-                    <label>Department</label>
-                    <input className="form-control" name="department" placeholder="" value={form.department} onChange={handle} />
-                  </div>
-                  <div className="form-group">
-                    <label>Subjects (comma-separated)</label>
-                    <input className="form-control" name="subjects" placeholder="" value={form.subjects} onChange={handle} />
-                  </div>
-                  <div className="form-group">
-                    <label>Groups / Classes</label>
-                    <input className="form-control" name="groups" placeholder="" value={form.groups} onChange={handle} />
-                  </div>
-                </>
-              )}
-
-              <button className="btn btn-primary btn-full" style={{ marginTop: 8 }} disabled={loading}>
-                {loading ? 'Please wait...' : isLogin ? 'Sign In →' : 'Create Account →'}
-              </button>
-
-              <div className="auth-switch">
-                {isLogin ? "Don't have an account? " : 'Already have an account? '}
-                <button type="button" onClick={() => setIsLogin(!isLogin)}>
-                  {isLogin ? 'Sign Up' : 'Sign In'}
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
+                >
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-
               {isLogin && (
-                <div style={{ marginTop: 16, padding: '11px 14px', background: 'rgba(108,99,255,0.07)', borderRadius: 12, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', border: '1px solid rgba(108,99,255,0.15)' }}>
-                  <strong style={{ color: 'var(--accent)' }}>Default Admin:</strong> admin@portal.com / admin123
+                <div style={{ textAlign: 'right', marginTop: 6 }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsForgot(true)}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    Forgot password?
+                  </button>
                 </div>
               )}
-            </form>
-          )}
+            </div>
 
-          {/* Announcement cards below the form */}
-          <div className="auth-info-cards">
-            {ANNOUNCEMENTS.map((a, i) => (
-              <div key={i} className={`auth-info-card ${a.type}`}>
-                <span>{a.icon}</span>
-                {a.text}
-              </div>
-            ))}
-          </div>
+            {!isLogin && role === 'student' && (
+              <>
+                <div className="form-group">
+                  <label>Roll Number</label>
+                  <input className="form-control" name="rollNumber" placeholder="e.g. CS2021001" value={form.rollNumber} onChange={handle} />
+                </div>
+                <div className="form-group">
+                  <label>Department</label>
+                  <input className="form-control" name="department" placeholder="e.g. Computer Science" value={form.department} onChange={handle} />
+                </div>
+                <div className="form-group">
+                  <label>Section / Group</label>
+                  <input className="form-control" name="groups" placeholder="e.g. CS-A" value={form.groups} onChange={handle} />
+                </div>
+              </>
+            )}
 
-          {/* Mini Calendar */}
-          <MiniCalendar />
-        </div>
+            {!isLogin && role === 'teacher' && (
+              <>
+                <div className="form-group">
+                  <label>Department</label>
+                  <input className="form-control" name="department" placeholder="e.g. Computer Science" value={form.department} onChange={handle} />
+                </div>
+                <div className="form-group">
+                  <label>Subjects (comma-separated)</label>
+                  <input className="form-control" name="subjects" placeholder="e.g. Math, Physics" value={form.subjects} onChange={handle} />
+                </div>
+                <div className="form-group">
+                  <label>Groups / Classes</label>
+                  <input className="form-control" name="groups" placeholder="e.g. CS-A, CS-B" value={form.groups} onChange={handle} />
+                </div>
+              </>
+            )}
+
+            <button className="btn btn-primary btn-full" style={{ marginTop: 8, padding: '14px', fontSize: 15, borderRadius: 14 }} disabled={loading}>
+              {loading ? 'Please wait...' : isLogin ? 'Sign In →' : 'Create Account →'}
+            </button>
+
+            <div className="auth-switch" style={{ marginTop: 20, textAlign: 'center' }}>
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <button type="button" onClick={() => setIsLogin(!isLogin)}>
+                {isLogin ? 'Sign Up' : 'Sign In'}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,18 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { Camera, Edit3, Save, X, Mail, Phone, Building, Hash, User, BookOpen, Calendar } from 'lucide-react';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  componentDidCatch(error, errorInfo) { console.error("Profile Error:", error, errorInfo); }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{padding: '50px', color: 'red'}}><h1>Something went wrong.</h1><pre>{this.state.error && this.state.error.toString()}</pre></div>;
+    }
+    return this.props.children;
+  }
+}
+
 export default function Profile() {
   const { user, setUser } = useAuth();
   const [editing, setEditing] = useState(false);
@@ -73,6 +85,7 @@ export default function Profile() {
       ];
 
   return (
+    <ErrorBoundary>
     <div className="page-enter">
       <div className="page-content">
         {/* Hero Card */}
@@ -219,5 +232,6 @@ export default function Profile() {
         </div>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

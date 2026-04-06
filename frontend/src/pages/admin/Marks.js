@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import API from '../../api';
 import toast from 'react-hot-toast';
 import { Lock, Unlock, Search, TrendingUp, CheckCircle, Clock } from 'lucide-react';
@@ -9,21 +9,22 @@ export default function AdminMarks() {
   const [search, setSearch] = useState('');
 
   const fetchMarks = () => {
-    API.get('/admin/marks').then(r => setMarks(r.data)).finally(() => setLoading(false));
+    API.get('/admin/marks').then(res => {
+      setMarks(res.data);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   };
 
   useEffect(() => { fetchMarks(); }, []);
 
   const toggleFinal = async (mark) => {
     const action = mark.isFinal ? 'UNLOCK' : 'FINALIZE';
-    if (!window.confirm(`${action} marks for ${mark.studentId?.name} in ${mark.subject}? Only admin can unlock entries.`)) return;
+    if (!window.confirm(`${action} marks for ${mark.studentId?.name} in ${mark.subject}?`)) return;
     try {
-      await API.put(`/admin/marks/${mark._id}/finalize`, { isFinal: !mark.isFinal });
+      await API.put(`/admin/marks/${mark._id}/toggle-final`);
       toast.success(`Marks ${mark.isFinal ? 'unlocked and restored to teacher edit mode' : 'finalized across all student views'}!`);
       fetchMarks();
-    } catch (err) {
-      toast.error('Failed to update lock status');
-    }
+    } catch { toast.error('Action failed'); }
   };
 
   const filtered = marks.filter(m => {

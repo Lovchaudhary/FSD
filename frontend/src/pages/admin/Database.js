@@ -56,7 +56,7 @@ export default function DatabasePanel() {
         {/* DB Stats */}
         <div style={{ display: 'flex', gap: 14, marginBottom: 24, flexWrap: 'wrap' }}>
           {[
-            { label: 'Database', value: 'eduportal_db', icon: '🗄️' },
+            { label: 'Database', value: 'examcell_db', icon: '🗄️' },
             { label: 'Total Size', value: '8.5 MB', icon: '💾' },
             { label: 'Collections', value: COLLECTIONS.length, icon: '📂' },
             { label: 'Total Docs', value: '2,101', icon: '📋' },

@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import API from '../../api';
 import toast from 'react-hot-toast';
-import { Plus, Edit2, Trash2, Search, UserCheck, UserX, Key, User, Shield, Info, Filter } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, UserCheck, UserX, Key, User, Shield, Info, Filter, BookOpen, Lock, Unlock } from 'lucide-react';
 
 const ROLES = ['student', 'teacher', 'admin'];
-const SUBJECTS_LIST = ['Math', 'Physics', 'Chemistry', 'Computer Science', 'English', 'Biology', 'History'];
+const ALL_SUBJECTS = [
+  'Data Structures', 'Algorithms', 'Operating Systems', 'Database MGMT',
+  'Calculus', 'Linear Algebra', 'Discrete Math',
+  'Digital Electronics', 'VLSI Design', 'Microprocessors',
+  'Engineering Drawing', 'Physics', 'Chemistry', 'Mathematics',
+  'Computer Networks', 'Software Engineering', 'Web Development',
+];
 
 const EMPTY_FORM = {
   name: '', email: '', password: '', role: 'student',
@@ -20,9 +26,10 @@ export default function AdminUsers() {
   const [editUser, setEditUser] = useState(null); 
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [permTeacher, setPermTeacher] = useState(null); // teacher for permissions modal
 
   const fetchUsers = () => {
-    API.get('/admin/users').then(r => setUsers(r.data)).finally(() => setLoading(false));
+    API.get('/admin/users').then(r => setUsers(r.data)).catch(() => toast.error('Failed to load users')).finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchUsers(); }, []);
@@ -59,7 +66,7 @@ export default function AdminUsers() {
         subjects: form.subjects ? form.subjects.split(',').map(s => s.trim()).filter(Boolean) : [],
         groups:   form.groups   ? form.groups.split(',').map(g => g.trim()).filter(Boolean)   : [],
       };
-      if (!payload.password) delete payload.password; 
+      if (!payload.password) delete payload.password;
 
       if (editUser) {
         await API.put(`/admin/users/${editUser._id}`, payload);
@@ -82,19 +89,23 @@ export default function AdminUsers() {
       await API.delete(`/admin/users/${id}`);
       toast.success('User removed from system');
       fetchUsers();
-    } catch (err) {
-      toast.error('Failed to delete user');
-    }
+    } catch (err) { toast.error('Failed to delete user'); }
   };
 
   const toggleActive = async (u) => {
     try {
-      await API.put(`/admin/users/${u._id}`, { isActive: !u.isActive });
-      toast.success(`User ${u.isActive ? 'deactivated' : 'activated'}`);
+      await API.put(`/admin/users/${u._id}/toggle`);
+      toast.success(`User ${!u.isActive ? 'activated' : 'deactivated'}`);
       fetchUsers();
-    } catch (err) {
-      toast.error('Failed to toggle status');
-    }
+    } catch (err) { toast.error('Failed to toggle status'); }
+  };
+
+  const calculateCGPA = async (id) => {
+    try {
+      const { data } = await API.post(`/admin/users/${id}/calculate-cgpa`);
+      toast.success(data.message);
+      fetchUsers();
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to calculate CGPA'); }
   };
 
   const filtered = users.filter(u => {
@@ -186,7 +197,12 @@ export default function AdminUsers() {
                              </td>
                              <td><span className={`badge-role ${u.role}`} style={{ fontWeight: 800, fontSize: 10, letterSpacing: 0.5 }}>{u.role.toUpperCase()}</span></td>
                              <td>
-                                {u.role === 'student' && <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--text-dim)', fontSize: 12 }}>{u.rollNumber || 'NO ROLL'}</span>}
+                                {u.role === 'student' && (
+                                   <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                      <span style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--text-dim)', fontSize: 12 }}>{u.rollNumber || 'NO ROLL'}</span>
+                                      <span className="badge bg-warm-2" style={{ fontSize: 10 }}>CGPA: {u.cgpa || '0'}</span>
+                                   </div>
+                                )}
                                 {u.role === 'teacher' && (
                                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 160 }}>
                                       {(u.subjects || []).slice(0,2).map(s => <span key={s} className="badge bg-warm-2" style={{ color: 'var(--text-dim)', fontSize: 9 }}>{s}</span>)}
@@ -203,6 +219,16 @@ export default function AdminUsers() {
                              <td style={{ fontSize: 11, color: 'var(--text-muted)' }}>{new Date(u.createdAt).toLocaleDateString()}</td>
                              <td style={{ textAlign: 'right' }}>
                                 <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
+                                   {u.role === 'teacher' && (
+                                     <button className="btn btn-ghost btn-xs" onClick={() => setPermTeacher(u)} title="Manage subject permissions" style={{ color: 'var(--primary)' }}>
+                                       <Key size={13} />
+                                     </button>
+                                   )}
+                                   {u.role === 'student' && (
+                                     <button className="btn btn-ghost btn-xs" onClick={() => calculateCGPA(u._id)} title="Calculate CGPA from marks" style={{ color: 'var(--accent)' }}>
+                                       <BookOpen size={13} />
+                                     </button>
+                                   )}
                                    <button className="btn btn-ghost btn-xs" onClick={() => openEdit(u)} title="Edit configuration">
                                       <Edit2 size={13} />
                                    </button>
@@ -296,6 +322,62 @@ export default function AdminUsers() {
           </div>
         </div>
       )}
+
+      {/* Subject Permissions Modal */}
+      {permTeacher && (() => {
+        const fresh = users.find(u => u._id === permTeacher._id);
+        const allowed = fresh?.allowedSubjects || [];
+        const allSubs = [...new Set([...ALL_SUBJECTS, ...(fresh?.subjects || [])])];
+        return (
+          <div className="modal-overlay">
+            <div className="modal" style={{ maxWidth: 540 }}>
+              <div className="modal-title">
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--primary-glow)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginRight: 12 }}>🔑</div>
+                Subject Upload Permissions — {permTeacher.name}
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+                Toggle which subjects this teacher can upload marks for. Teachers can only upload marks for <strong>allowed</strong> subjects.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+                {allSubs.map(sub => {
+                  const isAllowed = allowed.includes(sub);
+                  return (
+                    <button
+                      key={sub}
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const endpoint = isAllowed ? 'revoke-subject' : 'grant-subject';
+                          await API.put(`/admin/users/${fresh._id}/${endpoint}`, { subject: sub });
+                          toast.success(isAllowed ? `Revoked: ${sub}` : `Granted: ${sub}`);
+                          const fetchRes = await API.get('/admin/users');
+                          setUsers(fetchRes.data);
+                          setPermTeacher(fetchRes.data.find(u => u._id === permTeacher._id));
+                        } catch (err) { toast.error('Failed to update permission'); }
+                      }}
+                      style={{
+                        padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s',
+                        background: isAllowed ? 'var(--success-bg, #f0fdf4)' : 'var(--warm-1)',
+                        border: `1.5px solid ${isAllowed ? 'var(--success)' : 'var(--card-border)'}`,
+                        color: isAllowed ? 'var(--success)' : 'var(--text-muted)',
+                      }}
+                    >
+                      {isAllowed ? <UserCheck size={13} /> : <UserX size={13} />}
+                      {sub}
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ padding: '12px 16px', background: 'var(--warm-1)', borderRadius: 12, border: '1.5px solid var(--card-border)', fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>
+                <strong>✅ Allowed:</strong> {allowed.length > 0 ? allowed.join(', ') : 'None yet — grant at least one subject'}
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-primary btn-sm" onClick={() => setPermTeacher(null)}>Done</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

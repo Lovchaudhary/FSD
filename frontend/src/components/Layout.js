@@ -64,7 +64,7 @@ const NOTIFICATIONS = [
   { icon: '🎫', msg: 'Your ticket #T004 was resolved', time: '2d ago', bg: '#eff6ff' },
 ];
 
-export default function Layout() {
+export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const links = NAV[user?.role] || [];
@@ -128,7 +128,7 @@ export default function Layout() {
         <div className="sidebar-logo">
           <div className="logo-icon">🎓</div>
           <div>
-            <h2>EduPortal</h2>
+            <h2>ExamCell</h2>
             <span>Management System</span>
           </div>
           <button
@@ -192,7 +192,7 @@ export default function Layout() {
             </button>
             <div className="topbar-left">
               <h2>{getPageTitle(user?.role)}</h2>
-              <p>Welcome back, {user?.name?.split(' ')[0] || 'there'}! 👋</p>
+              <p>Welcome back, {getFirstName(user?.name)}! 👋</p>
             </div>
           </div>
 
@@ -243,7 +243,7 @@ export default function Layout() {
                 <div className="avatar-sm">
                   {avatarSrc ? <img src={avatarSrc} alt="avatar" /> : initials}
                 </div>
-                <span>{user?.name?.split(' ')[0]}</span>
+                <span>{getFirstName(user?.name)}</span>
                 <ChevronDown size={14} style={{ color: 'var(--text-muted)' }} />
               </button>
               {showProfile && (
@@ -269,7 +269,7 @@ export default function Layout() {
         </div>
 
         {/* Page Content */}
-        <Outlet />
+        {children}
       </main>
 
       <style>{`
@@ -286,5 +286,14 @@ function getPageTitle(role) {
   if (role === 'student') return 'Student Portal';
   if (role === 'teacher') return 'Teacher Portal';
   if (role === 'admin')   return 'Admin Panel';
-  return 'EduPortal';
+  return 'ExamCell';
+}
+
+const HONORIFICS = new Set(['prof.', 'dr.', 'mr.', 'mrs.', 'ms.', 'sir', 'prof', 'dr']);
+function getFirstName(fullName) {
+  if (!fullName) return 'there';
+  const parts = fullName.trim().split(' ');
+  // Skip any leading honorifics
+  const first = parts.find(p => !HONORIFICS.has(p.toLowerCase()));
+  return first || parts[parts.length - 1] || 'there';
 }

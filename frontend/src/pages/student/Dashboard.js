@@ -63,16 +63,12 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      API.get('/student/marks'),
-      API.get('/tickets/mine'),
-      API.get('/student/forms'),
-    ]).then(([m, t, f]) => {
-      setMarks(m.data);
-      setTickets(t.data);
-      setForms(f.data);
-    }).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+    API.get('/student/marks').then(res => {
+      const marks = res.data;
+      setMarks(marks);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [user]);
 
   const avg = marks.length
     ? Math.round(marks.reduce((s, m) => s + (m.marks / m.maxMarks) * 100, 0) / marks.length)
