@@ -52,8 +52,14 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get('/student/marks').then(res => {
-      setMarks(res.data);
+    Promise.all([
+      API.get('/student/marks'),
+      API.get('/student/tickets'),
+      API.get('/student/forms')
+    ]).then(([mRes, tRes, fRes]) => {
+      setMarks(mRes.data);
+      setTickets(tRes.data);
+      setForms(fRes.data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [user]);
@@ -79,7 +85,7 @@ export default function StudentDashboard() {
 
   const avg = marks.length
     ? Math.round(marks.reduce((s, m) => s + (m.marks / m.maxMarks) * 100, 0) / marks.length)
-    : 87;
+    : 'N/A';
 
   const openTickets = tickets.filter(t => t.status === 'open').length;
   const pendingForms = forms.filter(f => f.status === 'pending').length;
@@ -118,8 +124,8 @@ export default function StudentDashboard() {
           </div>
           <div style={{ display: 'flex', gap: 12, position: 'relative', zIndex: 1 }}>
             {[
-              { label: 'CGPA', val: '8.9', icon: '🏆' },
-              { label: 'Attendance', val: '87%', icon: '✅' },
+              { label: 'CGPA', val: user?.cgpa || 'N/A', icon: '🏆' },
+              { label: 'Attendance', val: 'N/A', icon: '✅' },
               { label: 'Backlogs', val: '0', icon: '🎯' },
             ].map(s => (
               <div key={s.label} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.08)', padding: '14px 18px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.12)' }}>
@@ -134,10 +140,10 @@ export default function StudentDashboard() {
         {/* Stat Cards */}
         <div className="stat-grid">
           {[
-            { icon: '📚', label: 'Total Subjects', value: marks.length || 5, cls: 'coral', change: '', sub: 'This semester' },
-            { icon: '📈', label: 'Avg Score', value: `${avg}%`, cls: 'violet', sub: 'Overall average' },
-            { icon: '🎫', label: 'Open Tickets', value: openTickets || 2, cls: 'amber', sub: 'Awaiting response' },
-            { icon: '📋', label: 'Pending Forms', value: pendingForms || 1, cls: 'rose', sub: 'Awaiting approval' },
+            { icon: '📚', label: 'Total Subjects', value: marks.length, cls: 'coral', change: '', sub: 'This semester' },
+            { icon: '📈', label: 'Avg Score', value: avg === 'N/A' ? 'N/A' : `${avg}%`, cls: 'violet', sub: 'Overall average' },
+            { icon: '🎫', label: 'Open Tickets', value: openTickets, cls: 'amber', sub: 'Awaiting response' },
+            { icon: '📋', label: 'Pending Forms', value: pendingForms, cls: 'rose', sub: 'Awaiting approval' },
           ].map((s, i) => (
             <div key={i} className="stat-card">
               <div className={`stat-icon ${s.cls}`} style={{ fontSize: 22 }}>{s.icon}</div>
