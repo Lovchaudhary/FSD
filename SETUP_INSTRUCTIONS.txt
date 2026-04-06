@@ -105,3 +105,18 @@ Password: Password123
 
 6-7 commands aur tumhara full stack app ready.
 Itna hi scene hai.then
+
+
+
+
+MONGO_URI = "mongodb://localhost:27017/fsddb"
+JWT_SECRET = "dfjlkadsjfioefkjhvd"
+
+
+
+
+
+
+
+//node mon install
+//npm install -D nodemon
