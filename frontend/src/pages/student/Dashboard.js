@@ -12,20 +12,9 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 
-const performanceData = [
-  { sem: 'Sem 1', SGPA: 7.8 },
-  { sem: 'Sem 2', SGPA: 8.1 },
-  { sem: 'Sem 3', SGPA: 8.4 },
-  { sem: 'Sem 4', SGPA: 8.9 },
-];
 
-const subjectData = [
-  { name: 'DSA',  score: 96 },
-  { name: 'DBMS', score: 87 },
-  { name: 'CN',   score: 77 },
-  { name: 'OS',   score: 82 },
-  { name: 'SE',   score: 93 },
-];
+
+
 
 const attendancePie = [
   { name: 'Present', value: 87, color: '#34c77b' },
@@ -64,11 +53,29 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     API.get('/student/marks').then(res => {
-      const marks = res.data;
-      setMarks(marks);
+      setMarks(res.data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [user]);
+
+  const dynamicSubjectData = marks.map(m => {
+    return { name: m.subject.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 4), score: Math.round((m.marks / m.maxMarks) * 100) };
+  });
+
+  const dynamicPerformanceData = React.useMemo(() => {
+    if (!marks || marks.length === 0) return [];
+    const bySem = {};
+    marks.forEach(m => {
+      const s = m.semester || 1;
+      if (!bySem[s]) bySem[s] = [];
+      bySem[s].push(m);
+    });
+    return Object.keys(bySem).sort().map(sem => {
+      const semMarks = bySem[sem];
+      const avg = semMarks.reduce((acc, m) => acc + (m.marks / m.maxMarks) * 100, 0) / semMarks.length;
+      return { sem: `Sem ${sem}`, SGPA: parseFloat((avg / 10).toFixed(1)) };
+    });
+  }, [marks]);
 
   const avg = marks.length
     ? Math.round(marks.reduce((s, m) => s + (m.marks / m.maxMarks) * 100, 0) / marks.length)
@@ -161,28 +168,35 @@ export default function StudentDashboard() {
           {/* Performance Trend */}
           <div className="card">
             <div className="card-title" style={{ marginBottom: 20 }}>📈 Academic Trend</div>
-            <ResponsiveContainer width="100%" height={180}>
-              <AreaChart data={performanceData}>
-                <defs>
-                  <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" />
-                <XAxis dataKey="sem" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                <YAxis domain={[6, 10]} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="SGPA" stroke="var(--primary)" strokeWidth={2.5} fill="url(#grad1)" dot={{ fill: 'var(--primary)', r: 4 }} />
-              </AreaChart>
-            </ResponsiveContainer>
+            {dynamicPerformanceData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={dynamicPerformanceData}>
+                  <defs>
+                    <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" />
+                  <XAxis dataKey="sem" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                  <YAxis domain={[0, 10]} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="SGPA" stroke="var(--primary)" strokeWidth={2.5} fill="url(#grad1)" dot={{ fill: 'var(--primary)', r: 4 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                No performance data available.
+              </div>
+            )}
           </div>
 
           {/* Subject Scores */}
           <div className="card">
             <div className="card-title" style={{ marginBottom: 20 }}>📊 Subject Scores</div>
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={subjectData} barSize={28}>
+            {dynamicSubjectData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={dynamicSubjectData} barSize={28}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
@@ -190,6 +204,11 @@ export default function StudentDashboard() {
                 <Bar dataKey="score" fill="var(--accent)" radius={[6, 6, 0, 0]} name="Score" />
               </BarChart>
             </ResponsiveContainer>
+            ) : (
+              <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                No finalized subject scores available.
+              </div>
+            )}
           </div>
 
           {/* Attendance Pie */}
@@ -226,11 +245,11 @@ export default function StudentDashboard() {
             <div className="loading-spinner" />
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px,1fr))', gap: 14 }}>
-              {(marks.length > 0 ? marks.slice(0, 5) : [
-                { _id: 1, subject: 'Data Structures', marks: 96, maxMarks: 100 },
-                { _id: 2, subject: 'Database MGMT',   marks: 87, maxMarks: 100 },
-                { _id: 3, subject: 'OS',              marks: 82, maxMarks: 100 },
-              ]).map(m => {
+              {marks.length === 0 ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: 13, gridColumn: '1 / -1', padding: '20px 0' }}>
+                  No recent marks published by teachers.
+                </div>
+              ) : marks.slice(0, 5).map(m => {
                 const pct = Math.round((m.marks / m.maxMarks) * 100);
                 return (
                   <div key={m._id} style={{ padding: '14px 16px', background: 'var(--warm-1)', borderRadius: 'var(--radius)', border: '1.5px solid var(--card-border)' }}>
