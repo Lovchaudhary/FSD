@@ -29,4 +29,26 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 ExamCell backend running on http://localhost:${PORT}`));
+const User = require('./models/User');
+
+const seedAdmin = async () => {
+  try {
+    const adminExists = await User.findOne({ email: 'admin@examcell.com' });
+    if (!adminExists) {
+      await User.create({
+        name: 'System Administrator',
+        email: 'admin@examcell.com',
+        password: 'Password123',
+        role: 'admin',
+        isActive: true
+      });
+      console.log('🛡️  Default Admin account created! (admin@examcell.com / Password123)');
+    }
+  } catch (err) {
+    console.error('Failed to seed admin:', err.message);
+  }
+};
+
+seedAdmin().then(() => {
+  app.listen(PORT, () => console.log(`🚀 ExamCell backend running on http://localhost:${PORT}`));
+});

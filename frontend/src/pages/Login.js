@@ -102,22 +102,6 @@ export default function Login() {
           <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>{pageSubtitle}</p>
         </div>
 
-        {/* Role tabs — sign up only */}
-        {!isLogin && !isForgot && (
-          <div className="role-tabs" style={{ marginBottom: 24 }}>
-            {ROLES.map(r => (
-              <button
-                key={r.id}
-                className={`role-tab ${role === r.id ? 'active' : ''}`}
-                onClick={() => setRole(r.id)}
-                type="button"
-              >
-                <span className="role-emoji">{r.emoji}</span>
-                {r.label}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Forgot Password Form */}
         {isForgot ? (
