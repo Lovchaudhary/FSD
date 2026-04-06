@@ -1,0 +1,60 @@
+=========================================
+EXAMCELL - FULL STACK SETUP GUIDE FOR NOOBS
+=========================================
+
+This guide will help you run the ExamCell full-stack application (React + Node.js + MongoDB) perfectly from scratch on your local machine.
+
+-----------------------------------------
+STEP 1: PREREQUISITE CHECKS
+-----------------------------------------
+Before doing anything, you need two things installed on your computer:
+1. Node.js (which includes npm)
+   - To check if you have it, open a terminal and type: node -v
+   - If it shows a version (e.g., v18.x.x), you're good! If not, download it from nodejs.org.
+2. A MongoDB Database URL
+   - Go to mongodb.com and create a free Atlas cluster.
+   - Get the connection string (it looks like: mongodb+srv://<username>:<password>@cluster0...)
+
+-----------------------------------------
+STEP 2: SETUP THE BACKEND (Node.js/Express)
+-----------------------------------------
+1. Open a terminal and navigate INTO the backend folder:
+   cd path/to/ExamCell/backend
+
+2. Install all the required packages (this downloads Express, Mongoose, etc.):
+   npm install
+
+3. Connect the Database:
+   - Inside the /backend folder, look for a file named .env. If it is missing, create a new file and name it specifically: .env
+   - Add these exact two lines inside it:
+     MONGO_URI=your_mongodb_connection_string_here
+     JWT_SECRET=some_random_secret_password
+
+4. Start the backend:
+   npm start
+   (If successful, it will say "🚀 ExamCell backend running on http://localhost:5000" and "✅ MongoDB connected")
+
+-----------------------------------------
+STEP 3: SETUP THE FRONTEND (React)
+-----------------------------------------
+1. Open a NEW separate terminal and navigate INTO the frontend folder:
+   cd path/to/ExamCell/frontend
+
+2. Install all the required packages (this downloads React, React-Router, etc.):
+   npm install
+
+3. Start the frontend:
+   npm start
+
+4. A browser window will automatically open to http://localhost:3000. 
+
+-----------------------------------------
+STEP 4: LOGIN CREDENTIALS
+-----------------------------------------
+You can login using the admin account seeded in your database, or create a brand new account!
+Default Admin Email: admin@examcell.com
+Default Password: Password123
+
+(To view all hidden system credentials later, visit http://localhost:3000/secret-admin and enter passcode: 2006 )
+
+Happy coding!
