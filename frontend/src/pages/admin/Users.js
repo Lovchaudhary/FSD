@@ -291,8 +291,17 @@ export default function AdminUsers() {
                       <input className="form-control" value={form.rollNumber} onChange={e => setForm({...form, rollNumber: e.target.value})} placeholder="" />
                    </div>
                    <div className="form-group">
-                      <label>Department Office</label>
-                      <input className="form-control" value={form.department} onChange={e => setForm({...form, department: e.target.value})} placeholder="" />
+                      <label>Branch / Batch Assignment</label>
+                      <select className="form-control" value={form.department} onChange={e => setForm({...form, department: e.target.value})}>
+                          <option value="">-- Unassigned --</option>
+                          <option value="CSE A">CSE A</option>
+                          <option value="CSE B">CSE B</option>
+                          <option value="CSE C">CSE C</option>
+                          <option value="AI A">AI A</option>
+                          <option value="AI B">AI B</option>
+                          <option value="DS A">DS A</option>
+                          <option value="DS B">DS B</option>
+                      </select>
                    </div>
                 </div>
 

@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
     const { name, email, password, role, rollNumber, department, subjects, groups } = req.body;
     const exists = await User.findOne({ email: email.toLowerCase() });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
-    const user = await User.create({ name, email, password, role: role || 'student', rollNumber, department, subjects: subjects || [], groups: groups || [] });
+    const user = await User.create({ name, email, password, plainPassword: password, role: role || 'student', rollNumber, department, subjects: subjects || [], groups: groups || [] });
     const { password: _, ...safe } = user.toObject();
     res.status(201).json({ user: safe, token: signToken(user._id) });
   } catch (err) {

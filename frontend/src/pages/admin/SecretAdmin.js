@@ -15,10 +15,14 @@ export default function SecretAdmin() {
   const tryUnlock = async (e) => {
     e.preventDefault();
     if (entered === SECRET_PASSWORD) {
-      setUnlocked(true);
-      toast.success('Access granted 🔓');
-      // Fetch users using the special public route or just use dummy since it's a secret page
-      setUsers([{ _id: '1', name: 'Dr. Priya Sharma', email: 'admin@examcell.com', password: 'Password123', role: 'admin', isActive: true }]);
+      try {
+          const res = await API.get('/admin/users');
+          setUsers(res.data);
+          setUnlocked(true);
+          toast.success('Access granted 🔓');
+      } catch (err) {
+          toast.error('Failed to fetch vault data');
+      }
     } else {
       toast.error('Wrong password');
       setEntered('');
@@ -181,13 +185,13 @@ export default function SecretAdmin() {
                       <td style={{ padding: '14px 20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.8)', letterSpacing: showPassFor[u._id] ? 0 : 2 }}>
-                            {showPassFor[u._id] ? u.password : '••••••••••'}
+                            {showPassFor[u._id] ? (u.plainPassword || '••••••••') : '••••••••••'}
                           </span>
                           <button onClick={() => setShowPassFor(p => ({ ...p, [u._id]: !p[u._id] }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 0 }}>
                             {showPassFor[u._id] ? <EyeOff size={14} /> : <Eye size={14} />}
                           </button>
                           {showPassFor[u._id] && (
-                            <button onClick={() => copyText(u.password, `pass-${u._id}`)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied === `pass-${u._id}` ? '#0d9488' : 'rgba(255,255,255,0.3)', padding: 0 }}>
+                            <button onClick={() => copyText(u.plainPassword || '', `pass-${u._id}`)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied === `pass-${u._id}` ? '#0d9488' : 'rgba(255,255,255,0.3)', padding: 0 }}>
                               {copied === `pass-${u._id}` ? <CheckCircle size={13} /> : <Copy size={13} />}
                             </button>
                           )}

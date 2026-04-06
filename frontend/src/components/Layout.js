@@ -49,7 +49,7 @@ const NAV = {
     { to: '/admin/users',       icon: Users,           label: 'User Mgmt',      section: 'Management' },
     { to: '/admin/marks',       icon: BookOpen,        label: 'Marks Control',  section: 'Management' },
     { to: '/admin/forms',       icon: ClipboardList,   label: 'Exam Forms',     section: 'Management' },
-    { to: '/admin/timetable',   icon: Clock,           label: 'Timetable',      section: 'Management' },
+
     { to: '/admin/fees',        icon: CreditCard,      label: 'Fees',           section: 'Management' },
     { to: '/admin/tickets',     icon: Ticket,          label: 'Tickets',        section: 'Support' },
     { to: '/admin/monitoring',  icon: Monitor,         label: 'Monitoring',     section: 'System' },

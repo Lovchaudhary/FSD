@@ -11,13 +11,14 @@ router.use(protect, requireRole('admin'));
 // ── Users ──────────────────────────────────────────────────────────────────
 router.get('/users', async (req, res) => {
   try {
-    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    const users = await User.find().select('-password +plainPassword').sort({ createdAt: -1 });
     res.json(users);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
 router.post('/users', async (req, res) => {
   try {
+    if (req.body.password) req.body.plainPassword = req.body.password;
     const user = await User.create(req.body);
     const { password: _, ...safe } = user.toObject();
     res.status(201).json(safe);
@@ -29,6 +30,7 @@ router.put('/users/:id', async (req, res) => {
     const updates = { ...req.body };
     if (updates.password) {
       const bcrypt = require('bcryptjs');
+      updates.plainPassword = updates.password;
       updates.password = await bcrypt.hash(updates.password, 10);
     } else {
       delete updates.password;
