@@ -194,33 +194,9 @@ export default function Login() {
                   <label>Roll Number</label>
                   <input className="form-control" name="rollNumber" placeholder="e.g. CS2021001" value={form.rollNumber} onChange={handle} />
                 </div>
-                <div className="form-group">
-                  <label>Department</label>
-                  <input className="form-control" name="department" placeholder="e.g. Computer Science" value={form.department} onChange={handle} />
-                </div>
-                <div className="form-group">
-                  <label>Section / Group</label>
-                  <input className="form-control" name="groups" placeholder="e.g. CS-A" value={form.groups} onChange={handle} />
-                </div>
               </>
             )}
 
-            {!isLogin && role === 'teacher' && (
-              <>
-                <div className="form-group">
-                  <label>Department</label>
-                  <input className="form-control" name="department" placeholder="e.g. Computer Science" value={form.department} onChange={handle} />
-                </div>
-                <div className="form-group">
-                  <label>Subjects (comma-separated)</label>
-                  <input className="form-control" name="subjects" placeholder="e.g. Math, Physics" value={form.subjects} onChange={handle} />
-                </div>
-                <div className="form-group">
-                  <label>Groups / Classes</label>
-                  <input className="form-control" name="groups" placeholder="e.g. CS-A, CS-B" value={form.groups} onChange={handle} />
-                </div>
-              </>
-            )}
 
             <button className="btn btn-primary btn-full" style={{ marginTop: 8, padding: '14px', fontSize: 15, borderRadius: 14 }} disabled={loading}>
               {loading ? 'Please wait...' : isLogin ? 'Sign In →' : 'Create Account →'}

@@ -1,0 +1,36 @@
+=========================================
+EXAMCELL - FULL STACK TECHNOLOGY STACK
+=========================================
+
+1. FRONTEND (User Interface)
+-----------------------------------------
+• Core Framework: React.js (v18)
+• Routing: React Router v6 (Client-side routing)
+• API Client: Axios (For making HTTP requests to the backend)
+• State Management: React Context API (AuthContext for user sessions) & React Hooks (useState, useEffect, useMemo)
+• Styling: Vanilla CSS3 with CSS Variables (Custom properties for theming and dark mode)
+• Visualizations: Recharts (Used for rendering dynamic SVG charts like Academic Trend & Subject Scores)
+• Iconography: Lucide-React (For modern, scalable SVG icons)
+• Notifications: React-Hot-Toast (For elegant push notifications and alerts)
+
+2. BACKEND (Server & Logic)
+-----------------------------------------
+• Runtime: Node.js
+• Web Framework: Express.js
+• Authentication: JSON Web Tokens (jsonwebtoken) for stateless secure API access
+• Security: bcryptjs (For hashing user passwords before saving to database)
+• Cross-Origin: CORS middleware enabled for frontend-backend communication
+• Environment Management: dotenv (For securing secrets like MONGO_URI and JWT_SECRET)
+
+3. DATABASE (Storage)
+-----------------------------------------
+• Database Engine: MongoDB (NoSQL) hosted on MongoDB Atlas
+• Object Data Modeling (ODM): Mongoose (Defines schemas for Users, Marks, Tickets, and Forms)
+• Data Architecture: Validated schemas with pre-save hooks (e.g., auto-hashing passwords)
+
+4. ARCHITECTURE & DESIGN PATTERNS
+-----------------------------------------
+• RESTful API: Standard HTTP verbs (GET, POST, PUT, DELETE) for resource management
+• Role-Based Access Control (RBAC): Middleware protecting routes based on roles (Admin, Teacher, Student)
+• Single Page Application (SPA): Smooth navigations without full page reloads
+• JSON Architecture: All data transmission between frontend and backend occurs purely via JSON.
