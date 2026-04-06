@@ -33,7 +33,7 @@ export default function TeacherDashboard() {
 
   const [myMarks, setMyMarks] = React.useState([]);
   const [allTickets, setAllTickets] = React.useState([]);
-  const allowedSubjects = user?.allowedSubjects || [];
+  const allowedSubjects = React.useMemo(() => user?.allowedSubjects || [], [user?.allowedSubjects]);
 
   React.useEffect(() => {
     API.get('/teacher/marks').then(res => setMyMarks(res.data)).catch(() => {});
